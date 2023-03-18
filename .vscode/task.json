@@ -13,6 +13,17 @@
             ]
         },
         {
+            "label": "colcon make",
+            "detail": "Build workspace (default)",
+            "type": "shell",
+            "command": "colcon build --merge-install --cmake-args '-DCMAKE_BUILD_TYPE=RelWithDebInfo' -Wall -Wextra -Wpedantic",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": "$gcc"
+        },
+        {
             "label": "python3",
             "type": "shell",
             "command": "python3",

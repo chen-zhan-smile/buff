@@ -5,28 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python3",
+            "name": "Launch",
             "type": "python",
             "request": "launch",
-            "stopOnEntry": true,
-            "python": "${command:python.interpreterPath}",
-            "program": "${file}",
-            "cwd": "${workspaceFolder}",
-            "env": {},
-            "envFile": "${workspaceFolder}/.env",
-            "console": "integratedTerminal"
+            "program": "${workspaceFolder}/install/${input:package}/bringup/launch/cleaner_gazebo.py",
+            "console": "integratedTerminal",
         },
+        // Example gdb launch of a ros executable
         {
-            "name": "gdb",
+            "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${fileDirname}/${fileBasenameNoExtension}.o",
+            "program": "${workspaceFolder}/install/lib/${input:package}/${input:program}",
             "args": [],
             "stopAtEntry": true,
-            "cwd": "${workspaceRoot}",
-            "environment": [],
+            "cwd": "${workspaceFolder}",
             "externalConsole": false,
-            "preLaunchTask": "build(g++)",
             "MIMode": "gdb",
             "setupCommands": [
                 {
@@ -35,6 +29,20 @@
                     "ignoreFailures": true
                 }
             ]
+        }
+    ],
+    "inputs": [
+        {
+            "id": "package",
+            "type": "promptString",
+            "description": "Package name",
+            "default": "rm_buff"
+        },
+        {
+            "id": "program",
+            "type": "promptString",
+            "description": "Program name",
+            "default": "buff_sub"
         }
     ]
 }

@@ -1,22 +1,27 @@
 cmake_minimum_required(VERSION 3.8)
 project(rm_buff)
-
+set(DCMAKE_EXPORT_COMPILE_COMMANDS True)
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
 # find dependencies
+
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(fmt REQUIRED)
-find_package(yaml-cpp REQUIRED)
+# find_package(fmt REQUIRED)
+# find_package(yaml-cpp REQUIRED)
 find_package(Ceres REQUIRED)
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
+# set()
 ament_auto_add_executable(buff_sub
-  src/sub.cpp
+  include/fan_tracking.hpp
+  src/fan_track/fan_tracking.cpp
+  src/buff_node.hpp
+  src/buff_node.cpp
 
 )
 ament_auto_add_executable(buff_image_pub
