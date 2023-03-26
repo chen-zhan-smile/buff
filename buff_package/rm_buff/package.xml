@@ -12,8 +12,8 @@
   <depend>rclcpp</depend>
   <depend>OpenCV</depend>
   <depend>Eigen3</depend>
-  <!-- <depend>fmt</depend> -->
-  <!-- <depend>yaml-cpp</depend> -->
+  <depend>fmt</depend>
+  <depend>yaml-cpp</depend>
   <depend>Ceres</depend>
   <build_depend>cv_bridge</build_depend>
   <build_depend>image_transport</build_depend>

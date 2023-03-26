@@ -1,13 +1,14 @@
 #ifndef __BUFF_NODE__
 #define __BUFF_NODE__
-#include "../include/fan_tracking.hpp"
-#include "ceresSolver.hpp"
+#include "ceres-solver/ceresSolver.hpp"
 #include "cv_bridge/cv_bridge.h"
+#include "fan_track/fan_tracking.hpp"
 #include "image_transport/image_transport.hpp"
 #include "opencv2/highgui.hpp"
 #include "rclcpp/logging.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/image.hpp"
+#include "std_msgs/msg/string.hpp"
 #include <functional>
 #include <image_transport/publisher.hpp>
 #include <image_transport/subscriber.hpp>
@@ -16,6 +17,7 @@
 #include <opencv2/opencv.hpp>
 #include <rclcpp/executors.hpp>
 #include <rclcpp/node.hpp>
+#include <rclcpp/time.hpp>
 namespace BUFF {
 
 class RM_buff : public rclcpp::Node {
@@ -42,6 +44,7 @@ class RM_buff : public rclcpp::Node {
 void RM_buff::image_callback(
     const sensor_msgs::msg::Image::ConstSharedPtr &msg ) {
     try {
+        
         //接收图像帧处理函数
         auto cv_ptr =
             cv_bridge::toCvCopy( msg, sensor_msgs::image_encodings::BGR8 );
@@ -54,7 +57,7 @@ void RM_buff::image_callback(
                       msg->encoding.c_str() );
     }
     RCLCPP_INFO( this->get_logger(), "OK----------------!!!!!" );
-};
+}
 
 } // namespace BUFF
 #endif

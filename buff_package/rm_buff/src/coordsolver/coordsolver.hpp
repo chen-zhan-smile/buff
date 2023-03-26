@@ -1,32 +1,48 @@
-#pragma once
+#ifndef __COORDSOLVER__
+#define __COORDSOLVER__
 
+#include "../../general.hpp"
+#include <Eigen/Core>
+#include <Eigen/Dense>
 #include <iostream>
 #include <iterator>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <Eigen/Core>
-#include <Eigen/Dense>
-
 #include <opencv2/opencv.hpp>
 #include <yaml-cpp/yaml.h>
 
 #include <opencv2/core/eigen.hpp>
 
-enum TargetType { SMALL, BIG, BUFF };
-
 using namespace std;
 using namespace cv;
+namespace BUFF {
 
-struct PnPInfo {
+inline Eigen::Vector3d rotationMatrixToEulerAngles( Eigen::Matrix3d &R ) {
+    double sy       = sqrt( R( 0, 0 ) * R( 0, 0 ) + R( 1, 0 ) * R( 1, 0 ) );
+    bool   singular = sy < 1e-6;
+    double x, y, z;
+    if ( !singular ) {
+        x = atan2( R( 2, 1 ), R( 2, 2 ) );
+        y = atan2( -R( 2, 0 ), sy );
+        z = atan2( R( 1, 0 ), R( 0, 0 ) );
+    } else {
+        x = atan2( -R( 1, 2 ), R( 1, 1 ) );
+        y = atan2( -R( 2, 0 ), sy );
+        z = 0;
+    }
+    return { z, y, x };
+}
+
+typedef struct {
     Eigen::Vector3d armor_cam;
     Eigen::Vector3d armor_world;
     Eigen::Vector3d R_cam;
     Eigen::Vector3d R_world;
     Eigen::Vector3d euler;
     Eigen::Matrix3d rmat;
-};
+} PnPInfo;
 
 class CoordSolver {
   public:
@@ -37,9 +53,8 @@ class CoordSolver {
 
     double dynamicCalcPitchOffset( Eigen::Vector3d &xyz );
 
-    PnPInfo pnp( const std::vector<Point2f> &points_pic,
-                 const Eigen::Matrix3d &rmat_imu, enum TargetType type,
-                 int method );
+    void pnp_slo( std::vector<Point2f> &points_pic, Eigen::Matrix3d &rmat_imu,
+                  int method = SOLVEPNP_IPPE );
 
     Eigen::Vector3d camToWorld( const Eigen::Vector3d &point_camera,
                                 const Eigen::Matrix3d &rmat );
@@ -74,7 +89,11 @@ class CoordSolver {
     double bullet_speed = 28;
     // double bullet_speed = 16;            //TODO:弹速可变
     const double k = 0.01903; // 25°C,1atm,小弹丸
-    // const double k = 0.000556;                //25°C,1atm,大弹丸
-    // const double k = 0.000530;                //25°C,1atm,发光大弹丸
-    const double g = 9.781;
+    const double g = 9.781;   //重力加速度
+
+  public:
+    PnPInfo pnp( const std::vector<Point2f> &points_pic,
+                 const Eigen::Matrix3d &rmat_imu, int method );
 };
+} // namespace BUFF
+#endif

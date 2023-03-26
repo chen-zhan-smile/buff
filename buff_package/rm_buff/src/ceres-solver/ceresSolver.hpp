@@ -5,13 +5,13 @@
  * @Autor: chen-zhan-smile
  * @Date: 2023-03-07 22:51:17
  * @LastEditors: chen-zhan-smile
- * @LastEditTime: 2023-03-18 15:14:34
+ * @LastEditTime: 2023-03-23 19:21:19
  */
 
 #ifndef __Ceres_Solver__
 #define __Ceres_Solver__
 
-#include "filter.hpp"
+#include "../filter/filter.hpp"
 #include <Eigen/Core>
 #include <ceres/ceres.h>
 #include <chrono>
@@ -21,7 +21,7 @@
 #include <future>
 #include <iostream>
 #include <vector>
-
+#include <rclcpp/logger.hpp>
 namespace BUFF {
 
 enum class Mode { Small = 0, BIG };
@@ -109,7 +109,7 @@ class BuffCeresSolver {
 
     bool is_params_confirmed; //参数确认
 
-    explicit BuffCeresSolver( const enum Mode mode );
+    explicit BuffCeresSolver();
     bool   CurveFitting( double speed, double dist, int timestamp,
                          double &result );
     bool   Mode_1_fitting( double &mean_velocity, double &rotate_speed_sum,

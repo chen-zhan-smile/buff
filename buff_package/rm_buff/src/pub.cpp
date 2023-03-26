@@ -22,6 +22,9 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/header.hpp"
 
+#include <yaml-cpp/node/parse.h>
+#include <yaml-cpp/yaml.h>
+
 int main( int argc, char **argv ) {
     // Check if video source has been passed as a parameter
     rclcpp::init( argc, argv );
@@ -31,6 +34,7 @@ int main( int argc, char **argv ) {
     image_transport::ImageTransport it( node );
     image_transport::Publisher      pub = it.advertise( "camera/image", 1 );
 
+    YAML::Node config = YAML::LoadFile( "../params/filter/filter.yaml" );
     // Convert the command line parameter index for the video device to an
     // integer
     std::string      video_path = "/home/chen/buff_test/buff_blue.mp4";
@@ -40,16 +44,16 @@ int main( int argc, char **argv ) {
     if ( !cap.isOpened() ) {
         return 1;
     }
-    cv::Mat                            frame;
-    std_msgs::msg::Header              hdr;
-    sensor_msgs::msg::Image::SharedPtr msg;
+    cv::Mat frame;
+
+    sensor_msgs::msg::Image::ConstSharedPtr msg;
 
     rclcpp::WallRate loop_rate( 5 );
     while ( rclcpp::ok() ) {
         cap >> frame;
         // Check if grabbed frame is actually full with some content
         if ( !frame.empty() ) {
-            msg = cv_bridge::CvImage( hdr, "bgr8", frame ).toImageMsg();
+            msg = cv_bridge::CvImage( msg->header, "bgr8", frame ).toImageMsg();
             pub.publish( msg );
             cv::waitKey( 1 );
         }

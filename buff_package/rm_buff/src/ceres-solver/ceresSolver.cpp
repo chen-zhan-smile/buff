@@ -1,18 +1,12 @@
 #include "ceresSolver.hpp"
 #include <cstddef>
 #include <memory>
+#include <rclcpp/logger.hpp>
+#include <rclcpp/logging.hpp>
+#include <string>
 
-BUFF::BuffCeresSolver::BuffCeresSolver( const enum Mode mode ) {
-    switch ( mode ) {
-    case Mode::Small:
-        this->mode = 0;
-        break;
-    case Mode::BIG:
-        this->mode = 1;
-        break;
-    default:
-        break;
-    }
+BUFF::BuffCeresSolver::BuffCeresSolver() {
+
     is_params_confirmed = false;
     /**
      * @description: f(x) = a * sin(ω * t + θ) + b
@@ -118,10 +112,11 @@ bool BUFF::BuffCeresSolver::CurveFitting( double speed, double dist,
             return false;
         }
     }
+    std::string coutstream = "";
     for ( auto param : params )
-        cout << param << " ";
-    cout << "\n"
-         << "--------------------" << endl;
+        coutstream + to_string( param ) + " ";
+    RCLCPP_INFO( rclcpp::get_logger( "CeresSolver" ), "[params] : %s",
+                 coutstream.c_str() );
     //设置发弹延迟
     int delay = ( mode == 1 ? delay_big : delay_small );
     //距离/弹丸速度+延迟发弹差
@@ -201,8 +196,11 @@ bool BUFF::BuffCeresSolver::Mode_1_fitting( double &mean_velocity,
         //计算拟合的RMSE值，如果不小于设定的值，输出参数报告(可以注释)，继续拟合
         auto rmse = evalRMSE( params_tmp );
         if ( rmse > max_rmse ) {
-            cout << summary.BriefReport() << endl;
-            // LOG( INFO ) << "[BUFF_PREDICT]RMSE is too high, Fitting failed!";
+            // cout << summary.BriefReport() << endl;
+            RCLCPP_INFO( rclcpp::get_logger( "CeresSolver" ), "%s",
+                         summary.BriefReport().c_str() );
+            RCLCPP_WARN( rclcpp::get_logger( "CeresSolver" ),
+                         "[BUFF_PREDICT]RMSE is too high, Fitting failed!" );
             return false;
         } else {
             //这里代表拟合成功，将 is_params_confirmed 置true
@@ -252,7 +250,8 @@ bool BUFF::BuffCeresSolver::Mode_1_fitting( double &mean_velocity,
             // LOG( INFO ) << "[BUFF_PREDICT]Params Updated! RMSE: " <<;
             params[ 2 ] = phase;
         }
-        cout << "RMSE:" << new_rmse << endl;
+        RCLCPP_INFO( rclcpp::get_logger( "CereSolver" ), "RMSE: %lf",
+                     new_rmse );
     }
     return true;
 }
@@ -303,7 +302,6 @@ double BUFF::BuffCeresSolver::calcAimingAngleOffset( double params[ 4 ],
         theta1 = ( b * t1 - ( a / omega ) * cos( omega * t1 + theta ) );
         // clang-format on
     }
-    // cout<<(theta1 - theta0) * 180 / CV_PI<<endl;
     return theta1 - theta0;
 }
 
@@ -344,9 +342,6 @@ double BUFF::BuffCeresSolver::evalMAPE( double params[ 4 ] ) {
         auto measure = target_info.speed;
 
         mape_sum += abs( ( measure - pred ) / measure );
-        // cout<<abs((measure - pred) / measure)<<endl;
     }
-    // mape = mape_sum / history_info.size() * 100;
-    // cout<<mape<<endl;
     return mape;
 }

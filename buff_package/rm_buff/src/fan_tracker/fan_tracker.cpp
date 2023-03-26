@@ -1,4 +1,4 @@
-#include "fan_tracker.h"
+#include "fan_tracker.hpp"
 
 /**
  * @brief 构造一个ArmorTracker对象
